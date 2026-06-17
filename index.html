@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MV TRAVELLER · WT4 S — VLSFO → LSMGO Conversion · Technical Presentation</title>
+<meta name="description" content="NOATUM CSM FZCO — Technical Department. Interactive 3D presentation of the WT4 S tank conversion, Port of Fujairah." />
+<style>
+  :root{
+    --navy-900:#05111f; --navy-800:#0a1d33; --navy-700:#0f2a4a; --navy-600:#143a63;
+    --steel:#1d4e89; --cyan:#21d4fd; --cyan-2:#2dd4bf; --gold:#f5b301;
+    --danger:#ff5a5f; --hfo:#c98a3a; --mgo:#37e3c4;
+    --ink:#e8f1fb; --muted:#9fb6cf; --line:rgba(120,170,220,.18);
+    --card:rgba(255,255,255,.035); --card-brd:rgba(140,190,235,.14);
+    --radius:16px; --maxw:1180px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(33,212,253,.10), transparent 60%),
+      radial-gradient(900px 600px at -10% 20%, rgba(45,212,191,.08), transparent 55%),
+      linear-gradient(180deg, var(--navy-900), #04101c 60%, #030b15);
+    background-attachment:fixed;
+  }
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:2}
+  .waves{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.45}
+  .waves::before,.waves::after{content:"";position:absolute;left:-50%;width:200%;height:46vh;bottom:-6vh;
+    background:radial-gradient(50% 60% at 50% 100%, rgba(33,212,253,.10), transparent 70%);
+    border-radius:45%;animation:roll 20s linear infinite}
+  .waves::after{bottom:-12vh;opacity:.6;animation-duration:30s;animation-direction:reverse}
+  @keyframes roll{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);
+    background:linear-gradient(180deg,rgba(5,17,31,.92),rgba(5,17,31,.55));border-bottom:1px solid var(--line)}
+  .topbar .row{display:flex;align-items:center;gap:14px;height:62px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.3px}
+  .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--cyan),var(--cyan-2));color:#04141f;font-weight:900;
+    box-shadow:0 6px 22px rgba(33,212,253,.35)}
+  .brand small{display:block;color:var(--muted);font-weight:500;letter-spacing:.4px;font-size:11px}
+  .topnav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+  .topnav a{color:var(--muted);font-size:13px;padding:7px 10px;border-radius:9px;font-weight:600;transition:.2s}
+  .topnav a:hover{color:var(--ink);background:rgba(120,170,220,.12)}
+  .print-btn{border:1px solid var(--card-brd);background:rgba(120,170,220,.08);color:var(--ink);
+    padding:7px 13px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+  .print-btn:hover{background:rgba(33,212,253,.18);border-color:var(--cyan)}
+
+  /* hero */
+  .hero{position:relative;padding:60px 0 24px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:2.5px;
+    text-transform:uppercase;color:var(--cyan-2);font-weight:700;border:1px solid var(--card-brd);
+    padding:7px 14px;border-radius:999px;background:var(--card)}
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+  .hero h1{font-size:clamp(30px,5.2vw,58px);line-height:1.05;margin:20px 0 6px;font-weight:800;
+    background:linear-gradient(120deg,#fff 10%,var(--cyan) 55%,var(--cyan-2) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.5px}
+  .hero .sub{font-size:clamp(15px,2.2vw,21px);color:var(--muted);max-width:780px;font-weight:500}
+  .route{display:inline-flex;align-items:center;gap:14px;margin-top:22px;flex-wrap:wrap;font-weight:700;font-size:clamp(15px,2vw,20px)}
+  .pill{padding:9px 18px;border-radius:12px;border:1px solid var(--card-brd);background:var(--card)}
+  .pill.from{color:#ffd47a}.pill.to{color:var(--cyan-2)}
+  .arrow{color:var(--cyan);font-size:24px;filter:drop-shadow(0 0 8px rgba(33,212,253,.6))}
+
+  .specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:34px 0 8px}
+  .spec{background:var(--card);border:1px solid var(--card-brd);border-radius:14px;padding:16px 18px;transition:.25s}
+  .spec:hover{transform:translateY(-3px);border-color:rgba(33,212,253,.5);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+  .spec .k{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .spec .v{font-size:19px;font-weight:800;margin-top:6px}
+
+  section{padding:42px 0;scroll-margin-top:78px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+  .sec-head .no{font-size:13px;font-weight:800;color:var(--cyan-2);border:1px solid var(--card-brd);
+    border-radius:8px;padding:4px 10px;background:var(--card)}
+  .sec-head h2{font-size:clamp(22px,3.2vw,32px);margin:0;font-weight:800;letter-spacing:-.3px}
+  .lead{color:var(--muted);max-width:860px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:860px){.grid-2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);padding:20px 22px}
+  .card h3{margin:0 0 10px;font-size:17px;display:flex;align-items:center;gap:10px}
+  .card h3 .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;
+    background:linear-gradient(135deg,rgba(33,212,253,.22),rgba(45,212,191,.18));font-size:16px}
+  .card p{margin:0 0 10px;color:var(--muted)}
+  .card p:last-child{margin-bottom:0}
+
+  /* ===== 3D TANK ===== */
+  .stage-wrap{margin-top:18px;border:1px solid var(--card-brd);border-radius:20px;overflow:hidden;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(33,212,253,.10), transparent 60%),
+      linear-gradient(180deg,rgba(8,22,40,.65),rgba(4,14,26,.85))}
+  .stage-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .stage-top .t{font-weight:800;letter-spacing:.3px;font-size:14px}
+  .stage-top .hint{margin-left:auto;color:var(--muted);font-size:12px;display:flex;align-items:center;gap:6px}
+  .ctrls{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px}
+  .ctrls button{background:rgba(120,170,220,.08);border:1px solid var(--card-brd);color:var(--ink);
+    font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:9px;cursor:pointer;transition:.18s}
+  .ctrls button:hover{background:rgba(33,212,253,.18);border-color:var(--cyan)}
+  .ctrls button.on{background:rgba(45,212,191,.2);border-color:var(--cyan-2);color:#eafff9}
+
+  .scene{height:440px;perspective:1500px;perspective-origin:50% 42%;
+    display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;overflow:hidden}
+  .scene:active{cursor:grabbing}
+  @media(max-width:560px){.scene{height:360px}}
+  .tank{position:relative;width:340px;height:200px;transform-style:preserve-3d;
+    transform:rotateX(-20deg) rotateY(38deg);transition:transform .05s linear}
+  /* glass faces */
+  .face{position:absolute;border:1px solid rgba(120,190,235,.55);
+    background:linear-gradient(135deg,rgba(80,150,210,.10),rgba(33,212,253,.06));
+    backdrop-filter:blur(1px);box-shadow:inset 0 0 30px rgba(33,212,253,.08)}
+  .glassoff .face{background:linear-gradient(135deg,rgba(20,58,99,.92),rgba(10,29,51,.96));backdrop-filter:none;box-shadow:inset 0 0 40px rgba(0,0,0,.5)}
+  .f-front {width:340px;height:200px;transform:translateZ(110px)}
+  .f-back  {width:340px;height:200px;transform:rotateY(180deg) translateZ(110px)}
+  .f-right {width:220px;height:200px;left:60px;transform:rotateY(90deg) translateZ(170px)}
+  .f-left  {width:220px;height:200px;left:60px;transform:rotateY(-90deg) translateZ(170px)}
+  .f-top   {width:340px;height:220px;top:-10px;transform:rotateX(90deg) translateZ(100px)}
+  .f-bottom{width:340px;height:220px;top:-10px;transform:rotateX(-90deg) translateZ(100px);
+    background:linear-gradient(135deg,rgba(40,80,120,.5),rgba(10,29,51,.7))}
+  .glassoff .f-front,.glassoff .f-right{opacity:0} /* see inside when solid */
+
+  /* liquid level (LSMGO) */
+  .liquid{position:absolute;width:336px;height:0;left:2px;bottom:2px;transform-style:preserve-3d;
+    transition:height 1.6s cubic-bezier(.2,.7,.2,1)}
+  .liquid .lf{position:absolute;background:linear-gradient(180deg,rgba(55,227,196,.34),rgba(33,160,150,.28));border:1px solid rgba(55,227,196,.5)}
+  .lf.lf-front{width:336px;height:100%;transform:translateZ(108px)}
+  .lf.lf-right{width:216px;height:100%;left:60px;transform:rotateY(90deg) translateZ(168px)}
+  .lf.lf-top{width:336px;height:216px;transform:rotateX(90deg) translateZ(0);top:0;
+    background:linear-gradient(135deg,rgba(55,227,196,.5),rgba(45,200,180,.4));box-shadow:0 0 26px rgba(55,227,196,.4)}
+
+  /* overflow level marker */
+  .oflow-line{position:absolute;width:340px;height:0;border-top:2px dashed var(--danger);left:0;
+    transform:translateZ(111px);box-shadow:0 0 10px rgba(255,90,95,.6)}
+  .oflow-tag{position:absolute;right:-6px;top:-9px;font-size:9px;font-weight:800;color:#fff;background:var(--danger);
+    padding:1px 6px;border-radius:5px;transform:translateZ(2px);white-space:nowrap}
+
+  /* heating coils */
+  .coils{position:absolute;left:34px;bottom:24px;width:272px;height:40px;transform-style:preserve-3d}
+  .tube{position:absolute;height:9px;border-radius:6px;
+    background:linear-gradient(180deg,#e9a13c,#9c5e1d);box-shadow:0 0 8px rgba(201,138,58,.5),inset 0 2px 2px rgba(255,255,255,.3)}
+  .tube.t1{width:272px;transform:translateZ(40px)}
+  .tube.t2{width:272px;transform:translateZ(0px)}
+  .tube.t3{width:272px;transform:translateZ(-40px)}
+  .riser{position:absolute;width:9px;height:54px;left:0;bottom:0;border-radius:6px;
+    background:linear-gradient(90deg,#e9a13c,#9c5e1d);transform:translateZ(0)}
+  .riser.r2{left:264px}
+  .blank{position:absolute;width:16px;height:16px;border-radius:50%;top:-22px;
+    background:radial-gradient(circle at 35% 30%,#fff,#9aa6b2 60%,#5b6470);border:2px solid #2b3340;
+    box-shadow:0 0 8px rgba(0,0,0,.5);transform:translateZ(0)}
+  .blank.b2{left:262px}
+
+  /* suction sump */
+  .sump{position:absolute;left:150px;bottom:-14px;width:40px;height:18px;
+    background:linear-gradient(180deg,#1d4e89,#0a1d33);border:1px solid rgba(120,190,235,.5);border-radius:0 0 6px 6px;transform:translateZ(0)}
+
+  /* nozzles on top */
+  .nz{position:absolute;width:14px;height:34px;border-radius:5px 5px 0 0;top:-34px;transform-style:preserve-3d}
+  .nz i{position:absolute;inset:0;border-radius:5px 5px 0 0}
+  .nz-fill{left:120px;transform:translateZ(20px)}
+  .nz-fill i{background:linear-gradient(180deg,#3aa0e9,#1d4e89)}
+  .nz-vent{left:280px;transform:translateZ(-70px)}
+  .nz-vent i{background:linear-gradient(180deg,#9aa6b2,#5b6470)}
+
+  /* level transmitter on right face */
+  .lt{position:absolute;width:8px;height:170px;border-radius:4px;left:60px;top:15px;
+    transform:rotateY(90deg) translateZ(150px);
+    background:linear-gradient(180deg,#37e3c4,#1d7d6e);box-shadow:0 0 10px rgba(55,227,196,.5)}
+
+  /* tie-in flange on front */
+  .tiein{position:absolute;width:22px;height:22px;border-radius:50%;left:24px;bottom:30px;
+    transform:translateZ(112px);background:radial-gradient(circle at 35% 30%,#7defff,#21d4fd 55%,#0e7c93);
+    border:2px solid #0a3a45;box-shadow:0 0 14px rgba(33,212,253,.8);animation:beat 2.2s infinite}
+  @keyframes beat{0%,100%{box-shadow:0 0 10px rgba(33,212,253,.6)}50%{box-shadow:0 0 22px rgba(33,212,253,1)}}
+
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:14px 16px 18px}
+  .lg{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink);
+    background:rgba(120,170,220,.05);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .sw{width:16px;height:16px;border-radius:5px;flex:none}
+  .sw.coil{background:linear-gradient(180deg,#e9a13c,#9c5e1d)}
+  .sw.liq{background:linear-gradient(180deg,#37e3c4,#1d7d6e)}
+  .sw.of{background:var(--danger)}
+  .sw.ti{background:#21d4fd}
+  .sw.lt{background:#37e3c4}
+  .sw.nz{background:#3aa0e9}
+  .lg small{display:block;color:var(--muted);font-size:11px;font-weight:600}
+
+  /* ===== ship profile ===== */
+  .ship-wrap{margin-top:16px;border:1px solid var(--card-brd);border-radius:18px;padding:18px;background:var(--card)}
+  .ship-svg{width:100%;height:auto;display:block}
+  .ship-cap{color:var(--muted);font-size:13px;margin-top:8px;text-align:center}
+
+  /* deep dive */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+  @media(max-width:860px){.dd{grid-template-columns:1fr}}
+  .dd .card h3 .ic{background:linear-gradient(135deg,rgba(245,179,1,.2),rgba(255,90,95,.15))}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .kv:last-child{border-bottom:0}
+  .kv .kk{color:var(--muted)}
+  .kv .vv{font-weight:700}
+  .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:6px;margin:0 6px 6px 0}
+  .tag.warn{color:#ffd9da;background:rgba(255,90,95,.16);border:1px solid rgba(255,90,95,.4)}
+  .tag.ok{color:#d8fff5;background:rgba(45,212,191,.14);border:1px solid rgba(45,212,191,.35)}
+  .tag.info{color:#cfeaff;background:rgba(33,212,253,.12);border:1px solid rgba(33,212,253,.32)}
+
+  /* capacity bars */
+  .capbar{margin:14px 0}
+  .capbar .lab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600}
+  .track{height:14px;border-radius:8px;background:rgba(120,170,220,.1);overflow:hidden;border:1px solid var(--line);position:relative}
+  .fillb{height:100%;border-radius:8px;width:0;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+  .fillb.hfo{background:linear-gradient(90deg,#e9a13c,#c98a3a)}
+  .fillb.mgo{background:linear-gradient(90deg,#2dd4bf,#37e3c4)}
+
+  /* photo gallery */
+  .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px}
+  .ph{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--card-brd);
+    background:linear-gradient(135deg,rgba(20,58,99,.4),rgba(10,29,51,.7));aspect-ratio:4/3;display:grid;place-items:center}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph .holder{text-align:center;color:var(--muted);padding:14px}
+  .ph .holder .ic{font-size:30px;opacity:.6}
+  .ph .cap{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;font-size:12px;font-weight:700;
+    background:linear-gradient(0deg,rgba(4,14,26,.92),transparent);color:var(--ink)}
+  .addnote{margin-top:14px;border:1px dashed var(--card-brd);border-radius:12px;padding:14px 16px;color:var(--muted);font-size:13px;background:rgba(120,170,220,.04)}
+  .addnote code{background:rgba(33,212,253,.12);padding:2px 7px;border-radius:6px;color:#cfeaff;font-weight:700}
+
+  /* hold chain */
+  .chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+  .chain .link{background:linear-gradient(135deg,rgba(255,90,95,.16),rgba(245,179,1,.10));
+    border:1px solid rgba(255,90,95,.35);border-radius:11px;padding:10px 14px;font-weight:700;font-size:13px;color:#ffe7c2}
+  .chain .sep{color:var(--gold);font-size:18px;font-weight:900}
+
+  footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:30px}
+  footer .doc{font-style:italic;max-width:680px;margin:0 auto 14px}
+  #bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:99;
+    background:linear-gradient(90deg,var(--cyan),var(--cyan-2),var(--gold));box-shadow:0 0 12px rgba(33,212,253,.6)}
+  .reveal{opacity:0;transform:translateY(22px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media(max-width:640px){.topnav{display:none}.hero{padding:40px 0 16px}}
+  @media print{.waves,.topbar,#bar,.print-btn,.topnav,.ctrls,.stage-top .hint{display:none!important}
+    body{background:#fff;color:#111}.hero h1{color:#0a1d33;-webkit-text-fill-color:#0a1d33}
+    .card,.spec,.stage-wrap,.ship-wrap,.ph,.chain .link{border-color:#bbb;background:#fff;box-shadow:none}
+    .reveal{opacity:1;transform:none}a{color:#0a1d33}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div class="waves" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wrap row">
+    <div class="brand"><span class="logo">⚓</span>
+      <span>MV TRAVELLER<small>NOATUM CSM FZCO · Technical Dept.</small></span>
+    </div>
+    <nav class="topnav">
+      <a href="#vessel">Vessel</a>
+      <a href="#model3d">3D Tank</a>
+      <a href="#systems">Systems</a>
+      <a href="#capacity">Capacity</a>
+      <a href="#gallery">Photos</a>
+      <a href="#holds">Hold Points</a>
+      <a href="MV-TRAVELLER-WT4S-Conversion-Plan.md">Full Plan ↗</a>
+    </nav>
+    <button class="print-btn" onclick="window.print()">⎙ Print / PDF</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="wrap">
+  <section class="hero" style="scroll-margin-top:0">
+    <span class="eyebrow"><span class="dot"></span> Interactive Technical Presentation · Rev 0</span>
+    <h1>WT4 S Tank Conversion</h1>
+    <p class="sub">A complete engineering walkthrough of re-designating starboard storage tank <b>WT4 S (347.1 m³)</b> from heavy fuel to marine gas oil — with an interactive 3D model, system deep-dives and the full execution plan. Port of Fujairah · under BV survey.</p>
+    <div class="route">
+      <span class="pill from">VLSFO · ρ 0.960</span><span class="arrow">➜</span><span class="pill to">LSMGO · ρ ~0.86</span>
+    </div>
+    <div class="specs">
+      <div class="spec"><div class="k">Vessel</div><div class="v">MV TRAVELLER</div></div>
+      <div class="spec"><div class="k">IMO</div><div class="v">9204726</div></div>
+      <div class="spec"><div class="k">Flag / Class</div><div class="v">Marshall Is. / BV</div></div>
+      <div class="spec"><div class="k">Owner</div><div class="v">Safeen Marine 28 Ltd</div></div>
+      <div class="spec"><div class="k">Tank</div><div class="v">WT4 S · 347.1 m³</div></div>
+      <div class="spec"><div class="k">Port</div><div class="v">Fujairah</div></div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+
+  <!-- VESSEL / SHIP PROFILE -->
+  <section id="vessel" class="reveal">
+    <div class="sec-head"><span class="no">01</span><h2>The Vessel &amp; Tank Location</h2></div>
+    <p class="lead">MV TRAVELLER is a Marshall Islands–flagged, Bureau Veritas–classed general-cargo / container vessel owned by Safeen Marine 28 Ltd. The conversion affects a single starboard storage tank, <b>WT4 S</b>, located in the after fuel-tank group, served by the common steam main and the shared air/overflow header.</p>
+
+    <div class="dd" style="margin-bottom:18px">
+      <div class="card">
+        <h3><span class="ic">📋</span> Vessel particulars <small style="color:var(--muted);font-weight:600;font-size:12px">· public registry</small></h3>
+        <div class="kv"><span class="kk">Type</span><span class="vv">General cargo / container</span></div>
+        <div class="kv"><span class="kk">Built</span><span class="vv">2000 · Hudong-Zhonghua, Shanghai</span></div>
+        <div class="kv"><span class="kk">Gross tonnage</span><span class="vv">6,714 GT</span></div>
+        <div class="kv"><span class="kk">Deadweight</span><span class="vv">8,729 DWT</span></div>
+        <div class="kv"><span class="kk">Container capacity</span><span class="vv">371 TEU</span></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📐</span> Dimensions &amp; identity</h3>
+        <div class="kv"><span class="kk">Length overall</span><span class="vv">100.5 m</span></div>
+        <div class="kv"><span class="kk">Beam</span><span class="vv">20.4 m</span></div>
+        <div class="kv"><span class="kk">Summer draught</span><span class="vv">8.2 m</span></div>
+        <div class="kv"><span class="kk">MMSI · Call sign</span><span class="vv">538010388 · V7A5974</span></div>
+        <div class="kv"><span class="kk">Home port</span><span class="vv">Majuro</span></div>
+      </div>
+    </div>
+
+    <div class="ship-wrap">
+      <svg class="ship-svg" viewBox="0 0 1000 280" role="img" aria-label="Ship side profile with WT4 S highlighted">
+        <defs>
+          <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#163a63"/><stop offset="1" stop-color="#0a1d33"/>
+          </linearGradient>
+          <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(33,212,253,.35)"/><stop offset="1" stop-color="rgba(33,212,253,0)"/>
+          </linearGradient>
+          <linearGradient id="tankg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#37e3c4"/><stop offset="1" stop-color="#1d7d6e"/>
+          </linearGradient>
+        </defs>
+        <!-- waterline -->
+        <rect x="0" y="205" width="1000" height="60" fill="url(#sea)"/>
+        <line x1="0" y1="205" x2="1000" y2="205" stroke="rgba(33,212,253,.6)" stroke-width="2" stroke-dasharray="6 6"/>
+        <!-- hull -->
+        <path d="M60,120 L880,120 Q940,120 950,150 L935,215 Q930,235 905,235 L150,235 Q70,235 50,180 Z" fill="url(#hull)" stroke="rgba(120,190,235,.4)" stroke-width="2"/>
+        <!-- deck line -->
+        <line x1="60" y1="120" x2="880" y2="120" stroke="rgba(120,190,235,.35)" stroke-width="1.5"/>
+        <!-- accommodation / bridge (aft) -->
+        <rect x="120" y="60" width="120" height="60" rx="6" fill="#0f2a4a" stroke="rgba(120,190,235,.4)"/>
+        <rect x="135" y="72" width="90" height="14" rx="3" fill="rgba(33,212,253,.25)"/>
+        <rect x="135" y="94" width="90" height="14" rx="3" fill="rgba(33,212,253,.18)"/>
+        <!-- funnel -->
+        <rect x="150" y="30" width="34" height="34" rx="5" fill="#143a63" stroke="rgba(120,190,235,.4)"/>
+        <rect x="156" y="36" width="22" height="8" rx="2" fill="var(--cyan)"/>
+        <!-- tank bays -->
+        <g font-family="Segoe UI" font-size="13" font-weight="700">
+          <rect x="280" y="135" width="90" height="80" rx="4" fill="rgba(201,138,58,.18)" stroke="rgba(201,138,58,.5)"/>
+          <text x="325" y="180" fill="#e9a13c" text-anchor="middle">HFO</text>
+          <rect x="375" y="135" width="90" height="80" rx="4" fill="rgba(201,138,58,.18)" stroke="rgba(201,138,58,.5)"/>
+          <text x="420" y="180" fill="#e9a13c" text-anchor="middle">HFO</text>
+          <!-- WT4 S highlighted -->
+          <rect x="470" y="130" width="105" height="90" rx="5" fill="url(#tankg)" stroke="#37e3c4" stroke-width="2.5"/>
+          <text x="522" y="172" fill="#04141f" text-anchor="middle" font-weight="800">WT4 S</text>
+          <text x="522" y="190" fill="#04141f" text-anchor="middle" font-size="10">347.1 m³</text>
+          <rect x="585" y="135" width="90" height="80" rx="4" fill="rgba(33,212,253,.12)" stroke="rgba(33,212,253,.4)"/>
+          <text x="630" y="180" fill="var(--cyan)" text-anchor="middle">MGO</text>
+        </g>
+        <!-- pointer to WT4 S -->
+        <line x1="522" y1="130" x2="522" y2="95" stroke="#37e3c4" stroke-width="2"/>
+        <circle cx="522" cy="92" r="4" fill="#37e3c4"/>
+        <text x="522" y="78" fill="#37e3c4" text-anchor="middle" font-size="13" font-weight="800" font-family="Segoe UI">CONVERSION TANK · STBD</text>
+        <!-- bow waves -->
+        <path d="M905,220 q20,-8 40,0" stroke="rgba(33,212,253,.5)" fill="none" stroke-width="2"/>
+        <text x="90" y="150" fill="var(--muted)" font-size="12" font-family="Segoe UI">AFT</text>
+        <text x="900" y="150" fill="var(--muted)" font-size="12" font-family="Segoe UI" text-anchor="end">FWD</text>
+      </svg>
+      <p class="ship-cap">Schematic side profile (indicative). WT4 S sits in the after fuel-tank group on the starboard side, between HFO storage tanks and the gas-oil group.</p>
+    </div>
+  </section>
+
+  <!-- 3D MODEL -->
+  <section id="model3d" class="reveal">
+    <div class="sec-head"><span class="no">02</span><h2>Interactive 3D Tank Model</h2></div>
+    <p class="lead">A live 3D model of WT4 S after conversion. <b>Drag to rotate.</b> The model shows the retained heating coils (blanked), the suction sump, top fill &amp; overflow nozzles, the side level transmitter, the new transfer-line tie-in flange, and the LSMGO working level held safely below the overflow line.</p>
+
+    <div class="stage-wrap">
+      <div class="stage-top">
+        <span class="t">⛴ WT4 S — As-Converted (LSMGO)</span>
+        <span class="hint">🖱 Drag to rotate · scroll-free</span>
+      </div>
+      <div class="ctrls">
+        <button id="btnAuto" class="on">⟳ Auto-rotate</button>
+        <button data-view="iso">Isometric</button>
+        <button data-view="front">Front</button>
+        <button data-view="side">Side</button>
+        <button data-view="top">Top</button>
+        <button id="btnGlass" class="on">Transparent shell</button>
+        <button id="btnFill" class="on">Show LSMGO level</button>
+      </div>
+      <div class="scene" id="scene">
+        <div class="tank" id="tank">
+          <!-- glass shell -->
+          <div class="face f-back"></div>
+          <div class="face f-left"></div>
+          <div class="face f-bottom"></div>
+          <div class="face f-top"></div>
+          <div class="face f-right"></div>
+          <div class="face f-front"></div>
+
+          <!-- internals -->
+          <div class="coils">
+            <div class="tube t1"></div><div class="tube t2"></div><div class="tube t3"></div>
+            <div class="riser r1"></div><div class="riser r2"></div>
+            <div class="blank b1"></div><div class="blank b2"></div>
+          </div>
+          <div class="sump"></div>
+          <div class="nz nz-fill"><i></i></div>
+          <div class="nz nz-vent"><i></i></div>
+          <div class="lt"></div>
+          <div class="tiein"></div>
+
+          <!-- liquid + overflow marker -->
+          <div class="liquid" id="liquid">
+            <div class="lf lf-front"></div>
+            <div class="lf lf-right"></div>
+            <div class="lf lf-top"></div>
+          </div>
+          <div class="oflow-line" id="oflow"><span class="oflow-tag">OVERFLOW LEVEL</span></div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="lg"><span class="sw coil"></span><span>Heating coils <small>retained · blanked internally</small></span></div>
+        <div class="lg"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#fff,#9aa6b2)"></span><span>Coil blanks <small>as-fitted, photo-recorded</small></span></div>
+        <div class="lg"><span class="sw ti"></span><span>Transfer-line tie-in <small>only BV-approved mod · DL0402</small></span></div>
+        <div class="lg"><span class="sw lt"></span><span>Level transmitter <small>LT FC-25 / LAH FC-27 · re-ranged</small></span></div>
+        <div class="lg"><span class="sw nz"></span><span>Fill / overflow nozzles <small>common header · DL0403</small></span></div>
+        <div class="lg"><span class="sw liq"></span><span>LSMGO working level <small>kept below overflow</small></span></div>
+        <div class="lg"><span class="sw of"></span><span>Overflow level <small>operational ullage limit</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYSTEMS DEEP DIVE -->
+  <section id="systems" class="reveal">
+    <div class="sec-head"><span class="no">03</span><h2>System Deep-Dive</h2></div>
+    <p class="lead">The four engineering systems that govern the conversion — what changes, why it matters, and how it is controlled.</p>
+    <div class="dd">
+
+      <div class="card">
+        <h3><span class="ic">🧽</span> 1 · Cleaning to a distillate standard</h3>
+        <p>The dominant challenge. Every trace of VLSFO clingage and sludge — especially in the dead spots around the retained heating coils and structure — must be removed so the tank meets <b>LSMGO specification, not merely gas-free</b>.</p>
+        <div><span class="tag info">Mucking out</span><span class="tag info">Hot alkaline wash</span><span class="tag info">Continuous slop strip</span><span class="tag ok">Distillate-clean acceptance</span></div>
+        <p style="margin-top:10px">Acceptance: visual cleanliness, no oily film, no free residue around coils and structure — issued to the contractor <b>in writing before work starts</b> and signed off with a photo record.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔧</span> 2 · Steam coils — isolate &amp; blank</h3>
+        <p>Coils are <b>retained, not removed</b>. The steam supply/return is isolated at the manifold (without interrupting other tanks on the same main), and the penetrations are <b>blanked from inside the tank</b>.</p>
+        <div class="kv"><span class="kk">Coil status</span><span class="vv">Retained in place</span></div>
+        <div class="kv"><span class="kk">Penetrations</span><span class="vv">Internally blanked</span></div>
+        <div class="kv"><span class="kk">Record</span><span class="vv">As-fitted photos</span></div>
+        <p style="margin-top:10px"><span class="tag warn">Note</span> Any future work on a blanked coil is a <b>fresh enclosed-space entry</b> and must remain traceable.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📟</span> 3 · Level alarm &amp; gauging</h3>
+        <p>The density drop from HFO 0.960 to LSMGO ~0.86 (≈10%) directly affects pressure-based gauging. Re-calibration is <b>mandatory</b> before the tank enters service.</p>
+        <div class="kv"><span class="kk">Pressure / hydrostatic type</span><span class="vv" style="color:#ffd9da">Re-range — or reads ~10% low</span></div>
+        <div class="kv"><span class="kk">Radar / float type</span><span class="vv" style="color:#d8fff5">Reading OK — verify setpoint</span></div>
+        <div class="kv"><span class="kk">Sounding tables</span><span class="vv">Unchanged (geometry)</span></div>
+        <div class="kv"><span class="kk">Loading computer</span><span class="vv">Update density 0.96 → ~0.86</span></div>
+        <p style="margin-top:10px"><span class="tag warn">SOLAS</span> High-level / overfill alarm function-tested at the corrected setpoint before service.</p>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🌀</span> 4 · Overflow / common vent</h3>
+        <p>No hardware modification. There is <b>no non-return device</b> on the gravity overflow line, so cross-contamination is controlled <b>operationally by ullage management</b>.</p>
+        <div class="kv"><span class="kk">WT4 S working level</span><span class="vv">Below overflow at all times</span></div>
+        <div class="kv"><span class="kk">Adjacent HFO tanks</span><span class="vv">Not filled above overflow</span></div>
+        <div class="kv"><span class="kk">Header (DL0403)</span><span class="vv">Free-draining to overflow tank</span></div>
+        <p style="margin-top:10px"><span class="tag ok">Control</span> Ullage management is recorded as a <b>formal operational control</b> — operational by design.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CAPACITY -->
+  <section id="capacity" class="reveal">
+    <div class="sec-head"><span class="no">04</span><h2>Capacity Shift &amp; Properties</h2></div>
+    <div class="grid-2">
+      <div class="card">
+        <h3><span class="ic">📊</span> Fleet bunker capacity (m³)</h3>
+        <div class="capbar">
+          <div class="lab"><span>VLSFO</span><span>838 → <b style="color:#e9a13c">491</b></span></div>
+          <div class="track"><div class="fillb hfo" data-w="59"></div></div>
+        </div>
+        <div class="capbar">
+          <div class="lab"><span>LSMGO</span><span>176 → <b style="color:#37e3c4">523</b></span></div>
+          <div class="track"><div class="fillb mgo" data-w="100"></div></div>
+        </div>
+        <p style="margin-top:8px"><span class="tag warn">Commercial</span> Owners/Charterers accept the reduced VLSFO endurance as part of confirming the conversion.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🧪</span> Product &amp; spec</h3>
+        <div class="kv"><span class="kk">From</span><span class="vv">VLSFO · ρ 0.960</span></div>
+        <div class="kv"><span class="kk">To</span><span class="vv">LSMGO · ρ ~0.86</span></div>
+        <div class="kv"><span class="kk">Spec</span><span class="vv">ISO 8217:2024 distillate</span></div>
+        <div class="kv"><span class="kk">Sulphur</span><span class="vv">0.10% S (ECA)</span></div>
+        <div class="kv"><span class="kk">Flash point</span><span class="vv">≥ 60 °C</span></div>
+        <div class="kv"><span class="kk">Atmosphere testing</span><span class="vv">IMO Res. MSC.581(110)</span></div>
+        <p style="margin-top:8px"><span class="tag ok">First parcel</span> A small first LSMGO parcel is loaded and lab-tested on-spec before the tank is declared in service.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="reveal">
+    <div class="sec-head"><span class="no">05</span><h2>Vessel &amp; Tank Photos</h2></div>
+    <p class="lead">Drop your vessel and tank photographs into an <code>images/</code> folder next to this page using the file names below — they will appear here automatically.</p>
+    <div class="gal" id="gal">
+      <div class="ph"><img src="images/vessel.jpg" alt="MV TRAVELLER" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/vessel.jpg</div></div><span class="cap">MV TRAVELLER — general view</span></div>
+      <div class="ph"><img src="images/tank-wt4s.jpg" alt="WT4 S tank" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/tank-wt4s.jpg</div></div><span class="cap">WT4 S — tank interior</span></div>
+      <div class="ph"><img src="images/coils.jpg" alt="Heating coils" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/coils.jpg</div></div><span class="cap">Heating coils &amp; blanks</span></div>
+      <div class="ph"><img src="images/tie-in.jpg" alt="Transfer line tie-in" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/tie-in.jpg</div></div><span class="cap">Transfer-line tie-in (DL0402)</span></div>
+      <div class="ph"><img src="images/cleaning.jpg" alt="Cleaning" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/cleaning.jpg</div></div><span class="cap">Tank cleaning in progress</span></div>
+      <div class="ph"><img src="images/transmitter.jpg" alt="Level transmitter" onerror="this.parentNode.classList.add('empty');this.remove();"><div class="holder"><div class="ic">📷</div><div>images/transmitter.jpg</div></div><span class="cap">Level transmitter / alarm</span></div>
+    </div>
+    <div class="addnote">📎 <b>How to add photos:</b> create a folder named <code>images</code> in the same place as this <code>index.html</code>, and put your pictures inside it named exactly as shown (e.g. <code>vessel.jpg</code>). Any name not present simply stays as a placeholder — nothing breaks.<br><br>
+    🌐 <b>Public photos of MV TRAVELLER (IMO 9204726)</b> for download:
+    <a href="https://www.shipspotting.com/photos/891171" target="_blank" rel="noopener">ShipSpotting</a> ·
+    <a href="https://www.marinetraffic.com/en/ais/details/ships/imo:9204726" target="_blank" rel="noopener">MarineTraffic</a> ·
+    <a href="https://www.vesselfinder.com/vessels/details/9204726" target="_blank" rel="noopener">VesselFinder</a> ·
+    <a href="https://www.fleetmon.com/vessels/traveller_9204726_38041/" target="_blank" rel="noopener">FleetMon</a></div>
+  </section>
+
+  <!-- HOLD POINTS -->
+  <section id="holds" class="reveal">
+    <div class="sec-head"><span class="no">06</span><h2>Critical Hold Points</h2></div>
+    <p class="lead">Seven sequential gates — no phase advances until its gate is cleared. The full step-by-step plan (Phases 0–9) is in the linked document.</p>
+    <div class="chain">
+      <span class="link">BV drawing approval</span><span class="sep">→</span>
+      <span class="link">Gas-free certificate</span><span class="sep">→</span>
+      <span class="link">Distillate-clean acceptance</span><span class="sep">→</span>
+      <span class="link">Tie-in tightness test</span><span class="sep">→</span>
+      <span class="link">BV verification</span><span class="sep">→</span>
+      <span class="link">High-level alarm test</span><span class="sep">→</span>
+      <span class="link">First-parcel on-spec</span>
+    </div>
+    <p style="margin-top:18px"><a href="MV-TRAVELLER-WT4S-Conversion-Plan.md" style="font-weight:700">→ Open the full execution plan (Phases 0–9, responsible parties, all hold points)</a></p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="doc">Internal planning document — indicative, subject to SMS, marine chemist, BV &amp; bunker documents.</p>
+    <p>MV TRAVELLER · IMO 9204726 · WT4 S · VLSFO → LSMGO · Port of Fujairah · Revision 0 (Draft)<br>
+    NOATUM CSM FZCO — Technical Department</p>
+  </div>
+</footer>
+
+<script>
+  /* progress bar */
+  var bar=document.getElementById('bar');
+  function onScroll(){var h=document.documentElement;bar.style.width=((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';}
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* reveal */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);
+    /* trigger fills */
+    e.target.querySelectorAll('.fillb').forEach(function(f){f.style.width=f.dataset.w+'%';});
+  }});},{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  /* ===== 3D tank interaction ===== */
+  var tank=document.getElementById('tank'), scene=document.getElementById('scene');
+  var rx=-20, ry=38, auto=true, dragging=false, lastX, lastY, raf;
+  var views={iso:[-20,38],front:[-6,0],side:[-8,90],top:[-78,28]};
+  function apply(){tank.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';}
+  function tick(){ if(auto && !dragging){ ry+=0.35; apply(); } raf=requestAnimationFrame(tick); }
+  tick();
+
+  function down(x,y){dragging=true;lastX=x;lastY=y;}
+  function move(x,y){ if(!dragging)return; ry+=(x-lastX)*0.5; rx-=(y-lastY)*0.4;
+    rx=Math.max(-89,Math.min(89,rx)); lastX=x;lastY=y; apply(); }
+  function up(){dragging=false;}
+  scene.addEventListener('mousedown',function(e){down(e.clientX,e.clientY);});
+  window.addEventListener('mousemove',function(e){move(e.clientX,e.clientY);});
+  window.addEventListener('mouseup',up);
+  scene.addEventListener('touchstart',function(e){var t=e.touches[0];down(t.clientX,t.clientY);},{passive:true});
+  scene.addEventListener('touchmove',function(e){var t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+  scene.addEventListener('touchend',up);
+
+  document.querySelectorAll('.ctrls [data-view]').forEach(function(b){
+    b.addEventListener('click',function(){var v=views[b.dataset.view];rx=v[0];ry=v[1];apply();});
+  });
+  var btnAuto=document.getElementById('btnAuto');
+  btnAuto.addEventListener('click',function(){auto=!auto;btnAuto.classList.toggle('on',auto);});
+  var btnGlass=document.getElementById('btnGlass');
+  btnGlass.addEventListener('click',function(){var on=tank.classList.toggle('glassoff');btnGlass.classList.toggle('on',!on);});
+
+  /* liquid level + overflow marker */
+  var liquid=document.getElementById('liquid'), oflow=document.getElementById('oflow');
+  var H=200, workPct=0.60, ofPct=0.78;            /* working 60%, overflow at 78% */
+  function setLevel(show){
+    liquid.style.height = show ? (H*workPct)+'px' : '0px';
+    oflow.style.bottom = (H*ofPct)+'px';
+  }
+  oflow.style.bottom=(H*ofPct)+'px';
+  setTimeout(function(){setLevel(true);},500);
+  var btnFill=document.getElementById('btnFill'), filled=true;
+  btnFill.addEventListener('click',function(){filled=!filled;btnFill.classList.toggle('on',filled);setLevel(filled);});
+
+  /* expand nothing special for print */
+</script>
+</body>
+</html>
